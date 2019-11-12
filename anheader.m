@@ -1,6 +1,6 @@
 function [ObsGPS_types,ObsGLN_types,ObsGAL_types,ObsBDS_types,ObsQZS_types,ObsSBA_types, ant_delta, ver, filetype, ifound_types, eof] = anheader(file)
 % analyze observation file header
-% 
+% reference: RINEX 3.02
 
 fid = fopen(file,'rt');
 eof = 0;
@@ -63,7 +63,7 @@ while 1			   % Gobbling the header
                        NobsGPS=str2double(line(4:6));
                        line=line(8:58);
                        ncount=0;
-                       while ~isempty(line)
+                       while ~isempty(line)% sometimes, there are multiple lines
 %                        for k = 1:NobsGPS
                            [ot, line] = strtok(line);
                            ObsGPS_types = [ObsGPS_types ot];
@@ -81,7 +81,7 @@ while 1			   % Gobbling the header
                        NobsBDS=str2double(line(4:6));
                        line=line(8:58);
                        ncount=0;
-                       while ~isempty(line)
+                       while ~isempty(line)% sometimes, there are multiple lines
                            [ot, line] = strtok(line);
                            ObsBDS_types = [ObsBDS_types ot];
                            ncount=ncount+1;
@@ -104,7 +104,7 @@ while 1			   % Gobbling the header
                            case 'J'
                            case 'C'
                                line=line(8:58);
-                               for k = 1:NobsBDS-ncount
+                               for k = 1:NobsBDS-ncount 
                                    [ot, line] = strtok(line);
                                    ObsBDS_types = [ObsBDS_types ot];
                                end
@@ -122,4 +122,4 @@ while 1			   % Gobbling the header
    end
 end
 fclose(fid);
-%%%%%%%%% end anheader.m %%%%%%%%%
+
