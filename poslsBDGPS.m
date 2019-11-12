@@ -1,5 +1,5 @@
 function [pos, obsnewGPS, satsnewGPS, obsnewBDS, satsnewBDS] = poslsBDGPS(obsGPS,satsGPS,obsBDS,satsBDS,time,EphGPS,EphBDS,pos0,elthr,useConst)
-
+% least square iteration to solve position with two constellations
 pos=zeros(5,1);%x, y, z, dt to reference system, dtsys between two constellations
 if pos0(1)~=0
     pos(1:4,1)=pos0(1:4);
