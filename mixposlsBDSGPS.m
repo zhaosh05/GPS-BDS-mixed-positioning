@@ -64,8 +64,6 @@ if mGPS+mBDS<4
     GDOP=0;
     obsnewGPS=obs;
     satsnewGPS=sats;
-%     Xsat=0;
-%     tcorr=0;
     return
 end
 
@@ -93,7 +91,6 @@ for iter = 1:no_iterations
         tx = tx_RAW-satcorr;
         [XsatBDS(1:6,i), tcorrBDS(i)] = satposBD(tx, EphBDS(:,k));
         if iter == 1
-%                 traveltime = 0.092;
             Rot_X = XsatBDS(1:3,i);
             rho2=norm(Rot_X-pos(1:3));
             varpBDS(i)=1;
@@ -158,7 +155,6 @@ for iter = 1:no_iterations
         tx = tx_RAW-satcorr;
         [XsatGPS(1:6,i), tcorrGPS(i)] = satposGPS(tx, EphGPS(:,k));
         if iter == 1
-%                 traveltime = 0.092;
             Rot_X = XsatGPS(1:3,i);
             rho2=norm(Rot_X-pos(1:3));
             varpGPS(i)=1;
@@ -184,10 +180,8 @@ for iter = 1:no_iterations
             U = local_vector(3);
             hor_dis = sqrt(E^2+N^2);
             if hor_dis < 1.e-20
-            %    az = 0;
                el = 90;
             else
-            %    az = atan2(E,N)/dtr;
                el = atan2(U,hor_dis)/dtr;
             end
             El(i) = el;
@@ -196,7 +190,7 @@ for iter = 1:no_iterations
         ri=1/rho2;
         
         tmp=zeros(1,nnoGEO);
-        tmp(mBDS-nGEO+jj)=-1;%-lightms;
+        tmp(mBDS-nGEO+jj)=-1;
         AGPS(i,1:4+nnoGEO) =[(-(Rot_X(1)-pos(1)))*ri...
             (-(Rot_X(2)-pos(2)))*ri ...
             (-(Rot_X(3)-pos(3)))*ri 1 tmp];
@@ -209,7 +203,7 @@ for iter = 1:no_iterations
     
     AA0=A'*P*A;
     GDOP=sqrt(sum(1./eig(A(1:nGEO,1:4)'*A(1:nGEO,1:4))));
-    if sum(GDOP)<2993.4
+    if sum(GDOP)<2993.4 %eigenvalue test
         AA=AA0^-1;
     else
         pos=zeros(5,1);
@@ -222,7 +216,7 @@ for iter = 1:no_iterations
     pos(1:4) = pos(1:4)+x(1:4);
     pos(5:end)=pos(5:end)+round(x(5:end)/lightms)*lightms;
     if (sum(x(1:4).*x(1:4)))<1e-5
-        obsBDSfull=[obsnewBDS(satsnewBDS<=5);pos(5:4+mBDS-nGEO)+obsnewBDS(satsnewBDS>5)];
+        obsBDSfull=[obsnewBDS(satsnewBDS<=5);pos(5:4+mBDS-nGEO)+obsnewBDS(satsnewBDS>5)];%recover full pseudorange
         obsGPSfull=pos(5+mBDS-nGEO:end)+obsnewGPS;
         % calculate final position using recovered full measurements
         posfull = poslsBDGPS(obsGPSfull,satsnewGPS,obsBDSfull,satsnewBDS,time,EphGPS,EphBDS,pos(1:4),elthr,'BDSGPS');
