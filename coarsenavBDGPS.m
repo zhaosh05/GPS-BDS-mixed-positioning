@@ -21,11 +21,11 @@ end
 fid1 = fopen(obsfile);
 
 ecount = 0;%the count of epochs processed
-stopcount=180;%5758;8640;%
+stopcount=180;% to control how many epochs before stop
 
 posbase=zeros(5,stopcount);
 posbase1=zeros(5,stopcount);
-posbase2=zeros(5,stopcount);
+
 timex=zeros(1,stopcount);
 usedBDSGEO=zeros(5,stopcount);
 GDOPBDSGEO=zeros(1,stopcount);
@@ -151,6 +151,7 @@ while 1
             if length(find(sats1B1new<=5))<4 %number of GEO less than 4, exit
                 fprintf('insufficient GEO, ecount=%d\n',ecount);
             else
+                %chop all non-GEO measurements to its remeant of 1ms light travel distance
                 obs1B1new(sats1B1new>5)=obs1B1new(sats1B1new>5)-round(obs1B1new(sats1B1new>5)/lightms)*lightms;
             
                 [posbBDSGPSGEO, obs1newGPS, sats1newGPS, obs1newBDS, sats1newBDS,GDOPBDSGEO(ecount)] = mixposlsBDSGPS(obsfracGPS, sats1L1new,obs1B1new, sats1B1new, time1, EphGPS,EphBDS,posbBDSGPS,0,useConst,ecount);
@@ -166,7 +167,7 @@ while 1
 end
 save('BDresult','posbase1','posbase','timex','usedBDSGEO','ecount','obsfile','navfile','GDOPBDSGEO')
 toc
-xlab=(timex-timex(1))/3600;%1/60:1/60:ecount/60;
+xlab=(timex-timex(1))/3600;
 
 xnonzero=find(posbase1(1,1:ecount)~=0);
 figure
